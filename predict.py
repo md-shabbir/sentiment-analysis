@@ -52,3 +52,5 @@ if __name__ == "__main__":
             f"[{out['sentiment']}] "
             f"(confidence={out['confidence']}) → {out['text']}"
         )
+
+#python predict.py --model /mnt/models/model.joblib  --text   "this product is terrible"   "i absolutely love this phone"
