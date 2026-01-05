@@ -1,11 +1,13 @@
 import pandas as pd
 import joblib
+import mlflow
+from pathlib import Path
 
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
-from sklearn.metrics import classification_report, roc_auc_score
+from sklearn.metrics import classification_report
 
 
 # -------------------------
@@ -50,12 +52,17 @@ def train():
 
     # Evaluation
     y_pred = pipeline.predict(X_test)
-    y_prob = pipeline.predict_proba(X_test)[:, 1]
 
-    print("\nClassification Report:")
-    print(classification_report(y_test, y_pred))
+    # Get classification report as dictionary
+    report = classification_report(y_test, y_pred, output_dict=True)
 
-    print("ROC-AUC:", roc_auc_score(y_test, y_prob))
+    print("Accuracy: ", report["accuracy"])
+    print("f1-score: ", report["weighted avg"]["f1-score"])
+
+    # Log metrics to MLflow
+    mlflow.log_metric("accuracy", report["accuracy"])
+    mlflow.log_metric("f1_score", report["weighted avg"]["f1-score"])
+    print("\nMetrics logged to MLflow")
 
     # Save model
     Path(MODEL_PATH).parent.mkdir(parents=True, exist_ok=True)
@@ -65,5 +72,4 @@ def train():
 
 
 if __name__ == "__main__":
-    from pathlib import Path
     train()
